@@ -7,7 +7,7 @@ CORS(app)  # Enable CORS for frontend access
 
 UPLOAD_FOLDER = "uploads"
 USERNAME = "admin"
-PASSWORD = "1234"
+PASSWORD = "akm2009@"
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
