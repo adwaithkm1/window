@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure File Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        input, button { margin: 10px; padding: 10px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h2>Secure File Manager</h2>
+
+    <h3>Upload File</h3>
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload</button>
+
+    <h3>Files</h3>
+    <button onclick="listFiles()">Refresh</button>
+    <ul id="fileList"></ul>
+
+    <h3>Login to Download/Delete</h3>
+    <div id="authSection">
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="authenticate()">Login</button>
+    </div>
+
+    <script>
+        let authToken = null;
+
+        function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            if (!fileInput.files.length) return alert("Select a file!");
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            fetch("/upload", { method: "POST", body: formData })
+                .then(response => response.json())
+                .then(data => alert(data.message || "Upload successful!"))
+                .catch(err => alert("Upload failed!"));
+        }
+
+        function listFiles() {
+            fetch("/files")
+                .then(response => response.json())
+                .then(data => {
+                    const fileList = document.getElementById("fileList");
+                    fileList.innerHTML = "";
+                    data.files.forEach(file => {
+                        const li = document.createElement("li");
+                        li.textContent = file;
+                        li.innerHTML += ` <button onclick="downloadFile('${file}')">Download</button>`;
+                        li.innerHTML += ` <button onclick="deleteFile('${file}')">Delete</button>`;
+                        fileList.appendChild(li);
+                    });
+                });
+        }
+
+        function authenticate() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            authToken = btoa(username + ":" + password);
+            alert("Authentication set!");
+        }
+
+        function downloadFile(filename) {
+            if (!authToken) return alert("Login required!");
+            fetch(`/download/${filename}`, { headers: { "Authorization": "Basic " + authToken } })
+                .then(response => {
+                    if (!response.ok) throw new Error("Unauthorized");
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                })
+                .catch(err => alert("Download failed!"));
+        }
+
+        function deleteFile(filename) {
+            if (!authToken) return alert("Login required!");
+
+            fetch(`/delete/${filename}`, {
+                method: "DELETE",
+                headers: { "Authorization": "Basic " + authToken }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || "File deleted!");
+                listFiles();
+            })
+            .catch(err => alert("Delete failed!"));
+        }
+    </script>
+</body>
+</html>

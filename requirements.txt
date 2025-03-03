@@ -1,0 +1,4 @@
+flask
+gunicorn
+waitress
+flask-cors
