@@ -7,13 +7,12 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
         input, button { margin: 10px; padding: 10px; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
     <h2>File Upload Manager</h2>
     
-    <h3>Upload File (No Login Required)</h3>
+    <h3>Upload File</h3>
     <input type="file" id="fileInput">
     <button onclick="uploadFile()">Upload</button>
 
@@ -21,17 +20,7 @@
     <button onclick="listFiles()">Refresh</button>
     <ul id="fileList"></ul>
 
-    <h3>Delete File (Requires Login)</h3>
-    <button onclick="showLogin()">Login</button>
-    <div id="authSection" class="hidden">
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="authenticate()">Submit</button>
-    </div>
-
     <script>
-        let authToken = null;
-
         function uploadFile() {
             const fileInput = document.getElementById("fileInput");
             if (!fileInput.files.length) return alert("Select a file!");
@@ -61,29 +50,11 @@
                 });
         }
 
-        function showLogin() {
-            document.getElementById("authSection").classList.remove("hidden");
-        }
-
-        function authenticate() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-
-            if (username === "" && password === "") {
-                authToken = "valid";  // Simulating token-based authentication
-                alert("Login successful!");
-            } else {
-                alert("Invalid credentials!");
-            }
-        }
-
         function downloadFile(filename) {
             window.location.href = `/download/${filename}`;
         }
 
         function deleteFile(filename) {
-            if (!authToken) return alert("Login required!");
-
             fetch(`/delete/${filename}`, { method: "DELETE" })
                 .then(response => response.json())
                 .then(data => {
