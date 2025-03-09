@@ -6,8 +6,6 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend access
 
 UPLOAD_FOLDER = "uploads"
-USERNAME = "admin"
-PASSWORD = "akm2009@"
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -31,16 +29,10 @@ def list_files():
 
 @app.route("/download/<filename>", methods=["GET"])
 def download_file(filename):
-    auth = request.authorization
-    if not auth or auth.username != USERNAME or auth.password != PASSWORD:
-        return jsonify({"error": "Unauthorized"}), 401
     return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
 
 @app.route("/delete/<filename>", methods=["DELETE"])
 def delete_file(filename):
-    auth = request.authorization
-    if not auth or auth.username != USERNAME or auth.password != PASSWORD:
-        return jsonify({"error": "Unauthorized"}), 401
     try:
         os.remove(os.path.join(UPLOAD_FOLDER, filename))
         return jsonify({"message": "File deleted successfully"})
