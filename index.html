@@ -21,7 +21,7 @@
     <button onclick="listFiles()">Refresh</button>
     <ul id="fileList"></ul>
 
-    <h3>Download & Delete (Requires Login)</h3>
+    <h3>Delete File (Requires Login)</h3>
     <button onclick="showLogin()">Login</button>
     <div id="authSection" class="hidden">
         <input type="text" id="username" placeholder="Username">
@@ -78,8 +78,7 @@
         }
 
         function downloadFile(filename) {
-            if (!authToken) return alert("Login required!");
-            window.location.href = `/uploads/${filename}`;
+            window.location.href = `/download/${filename}`;
         }
 
         function deleteFile(filename) {
