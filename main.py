@@ -4,19 +4,7 @@ from tkinter import filedialog, messagebox, simpledialog, Listbox, Scrollbar
 
 # Server URL
 SERVER_URL = "http://localhost:3000"
-USERNAME = "admin"  # Change this as needed
-PASSWORD = "akm2009"   # Change this as needed
 
-def authenticate():
-    global user_authenticated
-    username = simpledialog.askstring("Login", "Enter Username:")
-    password = simpledialog.askstring("Login", "Enter Password:", show='*')
-    
-    if username == USERNAME and password == PASSWORD:
-        user_authenticated = True
-        messagebox.showinfo("Success", "Login successful!")
-    else:
-        messagebox.showerror("Error", "Invalid username or password!")
 
 def upload_file():
     file_path = filedialog.askopenfilename()
@@ -32,6 +20,7 @@ def upload_file():
     else:
         messagebox.showerror("Error", "Failed to upload file!")
 
+
 def list_files():
     response = requests.get(f"{SERVER_URL}/files")
     if response.status_code == 200:
@@ -42,12 +31,8 @@ def list_files():
     else:
         messagebox.showerror("Error", "Failed to fetch file list!")
 
+
 def download_file():
-    if not user_authenticated:
-        authenticate()
-        if not user_authenticated:
-            return
-    
     selected_file = file_list.get(tk.ACTIVE)
     if not selected_file:
         messagebox.showwarning("Warning", "Please select a file to download!")
@@ -63,12 +48,8 @@ def download_file():
     else:
         messagebox.showerror("Error", "Failed to download file!")
 
+
 def delete_file():
-    if not user_authenticated:
-        authenticate()
-        if not user_authenticated:
-            return
-    
     selected_file = file_list.get(tk.ACTIVE)
     if not selected_file:
         messagebox.showwarning("Warning", "Please select a file to delete!")
@@ -81,10 +62,10 @@ def delete_file():
     else:
         messagebox.showerror("Error", "Failed to delete file!")
 
+
 # GUI Setup
 root = tk.Tk()
 root.title("Secure File Manager")
-user_authenticated = False
 
 upload_btn = tk.Button(root, text="Upload File", command=upload_file, width=20)
 upload_btn.pack(pady=5)
